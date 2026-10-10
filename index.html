@@ -610,16 +610,37 @@ document.getElementById('studentNames').addEventListener('input',()=>{
  updateClassSwitcher();
 });
 
-document.getElementById('loadStudents').onclick=()=>{
- const names=lines('studentNames'), box=document.getElementById('studentPointsList');
- if(!names.length){box.innerHTML='<div class="card">أضيفي الأسماء أولًا.</div>';return}
- studentScores=names.map(n=>{
-   const old=studentScores.find(x=>x.name===n);
-   return {name:n,points:old?old.points:0};
- });
- classData[currentClass].studentScores=studentScores;
- saveAll();
- renderStudentScores();
+document.getElementById('loadStudents').onclick = async () => {
+  const names = [...new Set(
+    lines('studentNames')
+      .map(n => n.trim())
+      .filter(Boolean)
+  )];
+
+  const box = document.getElementById('studentPointsList');
+
+  if (!names.length) {
+    box.innerHTML = '<div class="card">أضيفي أسماء الطالبات أولًا.</div>';
+    return;
+  }
+
+  const oldScores = classData[currentClass]?.studentScores || [];
+
+  studentScores = names.map(name => {
+    const old = oldScores.find(s => s.name === name);
+    return {
+      name,
+      points: old ? Number(old.points) || 0 : 0
+    };
+  });
+
+  classData[currentClass].studentScores = studentScores;
+
+  saveAll();
+  renderStudentScores();
+
+  console.log('الصف الحالي:', currentClass);
+  console.log('أسماء الطالبات:', studentScores);
 };
 
 function renderStudentScores(){
