@@ -733,6 +733,58 @@ if(savedCard){
 document.getElementById('selectedGrade').textContent='📚 الصف المختار: '+currentClass+' — لوحة نقاط مستقلة محفوظة تلقائيًا';
 if(studentScores.length){renderStudentScores()}
 </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
+const firebaseConfig = {
+  apiKey: "2rj81vdMDjPhPFVzcKF6DAf5KiS2",
+  authDomain: "safii-smart.firebaseapp.com",
+  projectId: "safii-smart",
+  storageBucket: "safii-smart.firebasestorage.app",
+  messagingSenderId: "485834036150",
+  appId: "1:485834036150:web:ef59791ae861d0ec762717"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const loginScreen = document.getElementById("loginScreen");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.body.classList.add("authenticated");
+    loginScreen.style.display = "none";
+  } else {
+    document.body.classList.remove("authenticated");
+    loginScreen.style.display = "flex";
+  }
+});
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  loginMessage.textContent = "جارٍ تسجيل الدخول...";
+
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginMessage.textContent = "";
+  } catch (error) {
+    loginMessage.textContent =
+      error.code === "auth/invalid-credential"
+        ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+        : "تعذّر تسجيل الدخول. تحققي من البيانات والاتصال.";
+  }
+});
+</script>
 </body>
 </html>
