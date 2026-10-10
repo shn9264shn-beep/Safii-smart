@@ -773,10 +773,38 @@ const loginScreen = document.getElementById("loginScreen");
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     document.body.classList.add("authenticated");
     loginScreen.style.display = "none";
+
+    try {
+      const classesRef = doc(
+        db,
+        "users",
+        user.uid,
+        "classes",
+        currentClass
+      );
+
+      const snapshot = await getDoc(classesRef);
+
+      if (snapshot.exists()) {
+        classData[currentClass] = {
+          ...classData[currentClass],
+          ...snapshot.data()
+        };
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(classData)
+        );
+
+        restoreClass();
+      }
+    } catch (error) {
+      console.error("تعذر استرجاع بيانات Firebase:", error);
+    }
   } else {
     document.body.classList.remove("authenticated");
     loginScreen.style.display = "flex";
