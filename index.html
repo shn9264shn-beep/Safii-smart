@@ -657,7 +657,10 @@ document.getElementById('makeGroups').onclick=()=>{
  g.forEach((arr,i)=>{const d=document.createElement('div');d.className='card';const h=document.createElement('h3');h.textContent='المجموعة '+(i+1);const list=document.createElement('p');list.textContent=arr.length?arr.join(' • '):'لم تُضف طالبات بعد';d.append(h,list);box.appendChild(d)});
  saveAll();
 };
-function linesFromText(value){return value.split(/\n|،|,/).map(x=>x.trim()).filter(Boolean)}
+function lines(id){
+  const el = document.getElementById(id);
+  return (el?.value || '').split(/\n|,|،/).map(x => x.trim()).filter(Boolean);
+}
 
 document.getElementById('showQuestion').onclick=()=>{
  const q=document.getElementById('questionText').value.trim();
