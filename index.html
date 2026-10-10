@@ -789,19 +789,33 @@ onAuthStateChanged(auth, async (user) => {
 
       const snapshot = await getDoc(classesRef);
 
-      if (snapshot.exists()) {
-        classData[currentClass] = {
-          ...classData[currentClass],
-          ...snapshot.data()
-        };
+   if (snapshot.exists()) {
+  classData[currentClass] = {
+    ...blankClass(),
+    ...snapshot.data()
+  };
 
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(classData)
-        );
+  studentScores = classData[currentClass].studentScores || [];
+  teams = classData[currentClass].teams || [];
 
-        restoreClass();
-      }
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(classData)
+  );
+
+  restoreClass();
+} else {
+  classData[currentClass] = blankClass();
+  studentScores = [];
+  teams = classData[currentClass].teams;
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(classData)
+  );
+
+  restoreClass();
+}
     } catch (error) {
       console.error("تعذر استرجاع بيانات Firebase:", error);
     }
