@@ -542,13 +542,51 @@ function restoreClass(){
  updateClassSwitcher();
 }
 
-function switchClass(name){
- saveAll();
- currentClass=name;
- localStorage.setItem(CLASS_KEY,currentClass);
- document.querySelectorAll('.grade-card').forEach(c=>c.classList.toggle('active',c.dataset.grade===currentClass));
- document.getElementById('selectedGrade').textContent='📚 الصف المختار: '+currentClass+' — جميع أدوات اللوحة مستقلة ومحفوظة تلقائيًا';
- restoreClass();
+async function switchClass(name) {
+  saveAll();
+
+  currentClass = name;
+  localStorage.setItem(CLASS_KEY, currentClass);
+
+  document.querySelectorAll('.grade-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.grade === currentClass);
+  });
+
+  document.getElementById('selectedGrade').textContent =
+    '📚 الصف المختار: ' + currentClass +
+    ' — جميع أدوات اللوحة مستقلة ومحفوظة تلقائيًا';
+
+  if (auth.currentUser) {
+    try {
+      const classesRef = doc(
+        db,
+        "users",
+        auth.currentUser.uid,
+        "classes",
+        currentClass
+      );
+
+      const snapshot = await getDoc(classesRef);
+
+      if (snapshot.exists()) {
+        classData[currentClass] = {
+          ...blankClass(),
+          ...snapshot.data()
+        };
+      } else {
+        classData[currentClass] = blankClass();
+      }
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(classData)
+      );
+    } catch (error) {
+      console.error("تعذر تحميل بيانات الصف:", error);
+    }
+  }
+
+  restoreClass();
 }
 
 const classSelect=document.getElementById('classSelect');
