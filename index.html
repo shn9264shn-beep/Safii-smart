@@ -53,9 +53,96 @@ textarea{min-height:130px;resize:vertical}
 footer{text-align:center;color:var(--muted);padding:22px;font-size:13px}
 @media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.teams,.challenge-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.app{padding:12px}h1{font-size:25px}.grid,.two,.teams,.challenge-grid{grid-template-columns:1fr}.timer{font-size:55px}}
+/* صفحة تسجيل الدخول */
+body:not(.authenticated) .app {
+  display: none !important;
+}
+
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #17324d, #159a9c);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 30px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 35px rgba(0,0,0,.15);
+  text-align: center;
+}
+
+.login-card .login-icon {
+  font-size: 55px;
+}
+
+.login-card h2 {
+  color: #17324d;
+  margin-bottom: 8px;
+}
+
+.login-card p {
+  color: #71808c;
+  line-height: 1.8;
+}
+
+.login-card input {
+  margin: 10px 0;
+  text-align: left;
+  direction: ltr;
+}
+
+.login-card button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.login-message {
+  color: #b42318;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
 </style>
 </head>
 <body>
+  <div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🧪</div>
+    <h2>صفّي الذكي</h2>
+    <p>منصة أ. شيخة المشايخية للعلوم والكيمياء</p>
+
+    <form id="loginForm">
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="البريد الإلكتروني"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="كلمة المرور"
+        autocomplete="current-password"
+        required
+      >
+
+      <button class="btn primary" type="submit">
+        تسجيل الدخول
+      </button>
+
+      <p id="loginMessage" class="login-message"></p>
+    </form>
+  </div>
+</div>
+
+<div class="app">
 <div class="app">
 <header>
   <div class="brand">
@@ -646,5 +733,6 @@ if(savedCard){
 document.getElementById('selectedGrade').textContent='📚 الصف المختار: '+currentClass+' — لوحة نقاط مستقلة محفوظة تلقائيًا';
 if(studentScores.length){renderStudentScores()}
 </script>
+
 </body>
 </html>
