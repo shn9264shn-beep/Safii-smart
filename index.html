@@ -499,18 +499,8 @@ function saveAll(){
  st.manualGroups=[...document.querySelectorAll('.manual-group-input')].map(x=>x.value);
  st.randomResult=document.getElementById('randomResult').textContent;
  st.trafficResult=document.getElementById('trafficResult').textContent;
-localStorage.setItem(STORAGE_KEY, JSON.stringify(classData));
-localStorage.setItem(CLASS_KEY, currentClass);
-
-// حفظ بيانات الصف في Firebase لحساب المعلمة المسجل
-if (auth.currentUser) {
-  setDoc(
-    doc(db, "users", auth.currentUser.uid, "classes", currentClass),
-    classData[currentClass]
-  ).catch(error => {
-    console.error("تعذر حفظ البيانات في Firebase:", error);
-  });
-}
+ localStorage.setItem(STORAGE_KEY,JSON.stringify(classData));
+ localStorage.setItem(CLASS_KEY,currentClass);
 }
 
 function restoreClass(){
@@ -542,51 +532,13 @@ function restoreClass(){
  updateClassSwitcher();
 }
 
-async function switchClass(name) {
-  saveAll();
-
-  currentClass = name;
-  localStorage.setItem(CLASS_KEY, currentClass);
-
-  document.querySelectorAll('.grade-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.grade === currentClass);
-  });
-
-  document.getElementById('selectedGrade').textContent =
-    '📚 الصف المختار: ' + currentClass +
-    ' — جميع أدوات اللوحة مستقلة ومحفوظة تلقائيًا';
-
-  if (auth.currentUser) {
-    try {
-      const classesRef = doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "classes",
-        currentClass
-      );
-
-      const snapshot = await getDoc(classesRef);
-
-      if (snapshot.exists()) {
-        classData[currentClass] = {
-          ...blankClass(),
-          ...snapshot.data()
-        };
-      } else {
-        classData[currentClass] = blankClass();
-      }
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(classData)
-      );
-    } catch (error) {
-      console.error("تعذر تحميل بيانات الصف:", error);
-    }
-  }
-
-  restoreClass();
+function switchClass(name){
+ saveAll();
+ currentClass=name;
+ localStorage.setItem(CLASS_KEY,currentClass);
+ document.querySelectorAll('.grade-card').forEach(c=>c.classList.toggle('active',c.dataset.grade===currentClass));
+ document.getElementById('selectedGrade').textContent='📚 الصف المختار: '+currentClass+' — جميع أدوات اللوحة مستقلة ومحفوظة تلقائيًا';
+ restoreClass();
 }
 
 const classSelect=document.getElementById('classSelect');
@@ -610,37 +562,16 @@ document.getElementById('studentNames').addEventListener('input',()=>{
  updateClassSwitcher();
 });
 
-document.getElementById('loadStudents').onclick = async () => {
-  const names = [...new Set(
-    lines('studentNames')
-      .map(n => n.trim())
-      .filter(Boolean)
-  )];
-
-  const box = document.getElementById('studentPointsList');
-
-  if (!names.length) {
-    box.innerHTML = '<div class="card">أضيفي أسماء الطالبات أولًا.</div>';
-    return;
-  }
-
-  const oldScores = classData[currentClass]?.studentScores || [];
-
-  studentScores = names.map(name => {
-    const old = oldScores.find(s => s.name === name);
-    return {
-      name,
-      points: old ? Number(old.points) || 0 : 0
-    };
-  });
-
-  classData[currentClass].studentScores = studentScores;
-
-  saveAll();
-  renderStudentScores();
-
-  console.log('الصف الحالي:', currentClass);
-  console.log('أسماء الطالبات:', studentScores);
+document.getElementById('loadStudents').onclick=()=>{
+ const names=lines('studentNames'), box=document.getElementById('studentPointsList');
+ if(!names.length){box.innerHTML='<div class="card">أضيفي الأسماء أولًا.</div>';return}
+ studentScores=names.map(n=>{
+   const old=studentScores.find(x=>x.name===n);
+   return {name:n,points:old?old.points:0};
+ });
+ classData[currentClass].studentScores=studentScores;
+ saveAll();
+ renderStudentScores();
 };
 
 function renderStudentScores(){
@@ -810,12 +741,7 @@ import {
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDo-GN2MIg0KtETOhYTCqU-lQRFVGdnGqw",
   authDomain: "safii-smart.firebaseapp.com",
@@ -827,57 +753,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+
 const loginScreen = document.getElementById("loginScreen");
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (user) {
     document.body.classList.add("authenticated");
     loginScreen.style.display = "none";
-
-    try {
-      const classesRef = doc(
-        db,
-        "users",
-        user.uid,
-        "classes",
-        currentClass
-      );
-
-      const snapshot = await getDoc(classesRef);
-
-   if (snapshot.exists()) {
-  classData[currentClass] = {
-    ...blankClass(),
-    ...snapshot.data()
-  };
-
-  studentScores = classData[currentClass].studentScores || [];
-  teams = classData[currentClass].teams || [];
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(classData)
-  );
-
-  restoreClass();
-} else {
-  classData[currentClass] = blankClass();
-  studentScores = [];
-  teams = classData[currentClass].teams;
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(classData)
-  );
-
-  restoreClass();
-}
-    } catch (error) {
-      console.error("تعذر استرجاع بيانات Firebase:", error);
-    }
   } else {
     document.body.classList.remove("authenticated");
     loginScreen.style.display = "flex";
