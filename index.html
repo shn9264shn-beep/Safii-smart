@@ -499,8 +499,18 @@ function saveAll(){
  st.manualGroups=[...document.querySelectorAll('.manual-group-input')].map(x=>x.value);
  st.randomResult=document.getElementById('randomResult').textContent;
  st.trafficResult=document.getElementById('trafficResult').textContent;
- localStorage.setItem(STORAGE_KEY,JSON.stringify(classData));
- localStorage.setItem(CLASS_KEY,currentClass);
+localStorage.setItem(STORAGE_KEY, JSON.stringify(classData));
+localStorage.setItem(CLASS_KEY, currentClass);
+
+// حفظ بيانات الصف في Firebase لحساب المعلمة المسجل
+if (auth.currentUser) {
+  setDoc(
+    doc(db, "users", auth.currentUser.uid, "classes", currentClass),
+    classData[currentClass]
+  ).catch(error => {
+    console.error("تعذر حفظ البيانات في Firebase:", error);
+  });
+}
 }
 
 function restoreClass(){
