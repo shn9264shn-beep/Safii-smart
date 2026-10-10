@@ -741,7 +741,12 @@ import {
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDo-GN2MIg0KtETOhYTCqU-lQRFVGdnGqw",
   authDomain: "safii-smart.firebaseapp.com",
