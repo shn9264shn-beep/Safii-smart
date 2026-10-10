@@ -743,7 +743,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "2rj81vdMDjPhPFVzcKF6DAf5KiS2",
+  apiKey: "AIzaSyDo-GN2MIg0KtETOhYTCqU-lQRFVGdnGqw",
   authDomain: "safii-smart.firebaseapp.com",
   projectId: "safii-smart",
   storageBucket: "safii-smart.firebasestorage.app",
@@ -778,12 +778,10 @@ loginForm.addEventListener("submit", async (event) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     loginMessage.textContent = "";
-  } catch (error) {
-    loginMessage.textContent =
-      error.code === "auth/invalid-credential"
-        ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
-        : "تعذّر تسجيل الدخول. تحققي من البيانات والاتصال.";
-  }
+} catch (error) {
+  console.error("Firebase login error:", error.code, error.message);
+  loginMessage.textContent = "رمز الخطأ: " + error.code;
+}
 });
 </script>
 </body>
